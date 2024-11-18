@@ -2,8 +2,8 @@
 
 struct idt_entry {
     uint16_t base_low;
-    uint16_t sel; // This is the interrupt stack table
-    uint8_t  ist; // This is the interrupt stack table
+    uint16_t sel; // Segment selector
+    uint8_t  ist;
     uint8_t  flags;
     uint16_t base_middle;
     uint32_t base_high;
@@ -34,16 +34,15 @@ void init_idt() {
     idtp.limit = sizeof(struct idt_entry) * 256 - 1;
     idtp.base = (uint64_t)&idt;
 
-    // Now we are going to be clearing the IDT
+    // Clear the IDT
     for(int i = 0; i < 256; i++) {
         set_idt_gate(i, 0, 0, 0);
     }
 
-    // Set keyboard interrupt (IRQ1 mapped to interrupt 33)
+    // Set specific interrupt handlers
     extern void keyboard_interrupt_handler();
     set_idt_gate(33, (uint64_t)keyboard_interrupt_handler, 0, 0x8E);
     
-    // Set timer interrupt (IRQ0 mapped to interrupt 32)
     extern void timer_interrupt_handler();
     set_idt_gate(32, (uint64_t)timer_interrupt_handler, 0, 0x8E);
     

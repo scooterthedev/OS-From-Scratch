@@ -11,7 +11,8 @@ gdt_flush:
     mov gs, ax
     mov ss, ax
     ; Far jump to reload CS and flush the instruction pipeline
-    jmp 0x08:.flush
-
-.flush:
+    push 0x08            ; Code segment selector
+    push .reload_cs      ; Return address
+    retfq                ; Far return to reload CS
+.reload_cs:
     ret

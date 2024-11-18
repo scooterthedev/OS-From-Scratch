@@ -1,6 +1,6 @@
 AS = nasm
 CC = gcc
-LD = ld
+LD = x86_64-elf-ld
 CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra \
          -Iinclude \
          -Ikernel/include \
@@ -38,7 +38,7 @@ kernel.elf: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
 	$(CC) $(CFLAGS) -c gui/src/window_manager.c -o gui/src/window_manager.o
 	$(CC) $(CFLAGS) -c file_explorer/src/explorer.c -o file_explorer/src/explorer.o
 	$(CC) $(CFLAGS) -c fs/fat32/fat32.c -o fs/fat32/fat32.o
-	$(LD) -nostdlib -T linker.ld --oformat=elf64-x86-64 \
+	$(LD) $(LDFLAGS) --oformat=elf64-x86-64 \
 		kernel/main.o kernel/gdt.o kernel/gdt_flush.o \
 		kernel/idt.o kernel/io.o kernel/interrupts.o kernel/memory.o \
 		 drivers/vga/vga.o drivers/keyboard/keyboard.o drivers/timer/timer.o \
@@ -46,7 +46,7 @@ kernel.elf: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
 
 scooter_os.bin: boot.bin kernel.elf
 	objcopy -O binary kernel.elf kernel.bin
-	cat boot.bin kernel.bin > scooter_os.bin
+	copy /b boot.bin + kernel.bin scooter_os.bin
 
 clean:
 	rm -f boot.bin kernel.elf kernel/*.o drivers/vga/*.o drivers/keyboard/*.o drivers/timer/*.o \
