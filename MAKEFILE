@@ -9,16 +9,27 @@ all: boot.bin kernel.bin scooter_os.bin
 boot.bin: boot/boot_sect.asm
 	$(AS) -f bin boot/boot_sect.asm -o boot.bin
 
-kernel.bin: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s
+kernel.bin: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
+           kernel/src/idt.c kernel/src/io.c kernel/src/interrupts.s \
+           kernel/src/memory.c \
+           drivers/vga/vga.c drivers/keyboard/keyboard.c
 	$(CC) $(CFLAGS) -c kernel/src/main.c -o kernel/main.o
 	$(CC) $(CFLAGS) -c kernel/src/gdt.c -o kernel/gdt.o
 	$(AS) -f elf64 kernel/src/gdt_flush.s -o kernel/gdt_flush.o
+	$(CC) $(CFLAGS) -c kernel/src/idt.c -o kernel/idt.o
+	$(CC) $(CFLAGS) -c kernel/src/io.c -o kernel/io.o
+	$(AS) -f elf64 kernel/src/interrupts.s -o kernel/interrupts.o
+	$(CC) $(CFLAGS) -c kernel/src/memory.c -o kernel/memory.o
+	$(CC) $(CFLAGS) -c drivers/vga/vga.c -o drivers/vga/vga.o
+	$(CC) $(CFLAGS) -c drivers/keyboard/keyboard.c -o drivers/keyboard/keyboard.o
 
 scooter_os.bin: boot.bin kernel.bin linker.ld
-	$(LD) $(LDFLAGS) boot.bin kernel/main.o kernel/gdt.o kernel/gdt_flush.o -o scooter_os.bin
+	$(LD) $(LDFLAGS) boot.bin kernel/main.o kernel/gdt.o kernel/gdt_flush.o \
+          kernel/idt.o kernel/io.o kernel/interrupts.o kernel/memory.o \
+          drivers/vga/vga.o drivers/keyboard/keyboard.o -o scooter_os.bin
 
 clean:
-	rm -f boot.bin kernel/*.o scooter_os.bin
+	rm -f boot.bin kernel/*.o drivers/vga/*.o drivers/keyboard/*.o scooter_os.bin
 
 run: all
 	"C:\Program Files\qemu\qemu-system-x86_64.exe" -drive format=raw,file=scooter_os.bin
