@@ -1,5 +1,6 @@
 #include "fat32.h"
+#include "../drivers/vga/vga.h"
 
 void fat32_init() {
-    // TODO: Implement the FAT32 driver
+    vga_print("Initializing FAT32...\n");
 }

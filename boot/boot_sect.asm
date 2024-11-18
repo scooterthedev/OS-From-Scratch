@@ -29,7 +29,7 @@ protected_mode:
 
     call enable_a20 ; Enabling the A20 line ie. the 21st bit of the address
 
-    jmp 0x08:long_mode ; Switching to long mode by setting up a page table by loading CR3 and CR4
+    jmp 0x10:long_mode ; Switching to long mode by setting up a page table by loading CR3 and CR4
 
 enable_a20:
     ret
@@ -37,7 +37,7 @@ enable_a20:
 gdt_start:
     dq 0x0000000000000000 ; Null
     dq 0x00CF9A000000FFFF
-    dq 0x000092000000FFFF
+    dq 0x00CF92000000FFFF
 
 gdt_descriptor:
     dw gdt_end - gdt_start - 1
@@ -48,3 +48,10 @@ gdt_end:
 times 510 - ($ - $$) db 0
 ; Defines where the bootloader is located
 DW 0xAA55
+
+[BITS 64]
+long_mode:
+    ; Placeholder for long mode code
+    ; For now, we'll halt the system
+    hlt
+    jmp $

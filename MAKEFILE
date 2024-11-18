@@ -1,7 +1,7 @@
 AS = nasm
 CC = gcc
 LD = ld
-CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra -Iinclude
+CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra -Iinclude -Ikernel/include
 LDFLAGS = -T linker.ld -o scooter_os.bin
 
 all: boot.bin kernel.bin scooter_os.bin
