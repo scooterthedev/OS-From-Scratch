@@ -1,22 +1,22 @@
 AS = nasm
-CC= gcc
+CC = gcc
 LD = ld
-CFLAGS = -ffreestanding -m64 -nostdlib
+CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra -Iinclude
 LDFLAGS = -T linker.ld -o scooter_os.bin
 
-all: bin.bin kernel.bin scooter_os.bin
+all: boot.bin kernel.bin scooter_os.bin
 
 boot.bin: boot/boot_sect.asm
 	$(AS) -f bin boot/boot_sect.asm -o boot.bin
 
 kernel.bin: kernel/src/main.c
-	$(CC) $(CFLAGS) -c kernel/src/main.c -o kernel.o
+	$(CC) $(CFLAGS) -c kernel/src/main.c -o kernel/main.o
 
-scooter_os.bin: boot.bin kernel.bin
+scooter_os.bin: boot.bin kernel.bin linker.ld
 	$(LD) $(LDFLAGS) boot.bin kernel/main.o -o scooter_os.bin
 
 clean:
-	rm -f *.bin kernel/*.o
+	rm -f boot.bin kernel/*.o scooter_os.bin
 
 run: all
-	"C:\Program Files\qemu\qemu-system-x86_64.exe" --drive format=raw,file=scooter_os.bin"
+	"C:\Program Files\qemu\qemu-system-x86_64.exe" -drive format=raw,file=scooter_os.bin
