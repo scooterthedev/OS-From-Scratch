@@ -2,18 +2,18 @@
 
 struct gdt_entry
 {
-    uinit16_t limit_low;
-    uinit16_t base_low;
-    uinit8_t base_middle;
-    uinit8_t access;
-    uinit8_t granularity;
-    uinit8_t base_high;
-} __attribute___((packed));
+    uint16_t limit_low;
+    uint16_t base_low;
+    uint8_t base_middle;
+    uint8_t access;
+    uint8_t granularity;
+    uint8_t base_high;
+}___attribute___((packed));
 
 struct gdt_ptr {
-    uinit16_t limit;
-    uinit16_t base;
-} __attribute___((packed));
+    uint16_t limit;
+    uint16_t base;
+}___attribute___((packed));
 
 struct gdt_entry gdt[3];
 struct gdt_ptr gp;
@@ -22,7 +22,7 @@ extern void gdt_flush(uinit64_t);
 
 void init_gdt() {
     gp.limit = (sizeof(struct gdt_entry) * 3) -1;
-    gp.base = (uinit64_t)&gdt;
+    gp.base = (uint64_t)&gdt;
 
     // Null Time
     gdt[0].limit_low = 0;
@@ -48,5 +48,5 @@ void init_gdt() {
     gdt[2].granularity = 0xCF;
     gdt[2].base_high = 0;
 
-    gdt_flush((uinit64_t)&gp)
+    gdt_flush((uint64_t)&gp)
 }
