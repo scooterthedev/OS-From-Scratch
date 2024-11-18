@@ -1,6 +1,6 @@
 AS = nasm
 CC = gcc
-LD = x86_64-elf-ld
+LD = ld
 CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra \
          -Iinclude \
          -Ikernel/include \
@@ -9,7 +9,8 @@ CFLAGS = -ffreestanding -m64 -nostdlib -Wall -Wextra \
          -Idrivers/timer \
          -Igui/include \
          -Ifile_explorer/include \
-         -Ifs/fat32
+         -Ifs/fat32 \
+         -mcmodel=large -mno-red-zone -mno-mmx -mno-sse -mno-sse2
 LDFLAGS = -T linker.ld -nostdlib
 
 all: scooter_os.bin
@@ -19,6 +20,7 @@ boot.bin: boot/boot_sect.asm
 
 kernel.elf: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
            kernel/src/idt.c kernel/src/io.c kernel/src/interrupts.s \
+           kernel/src/idt_flush.s \
            kernel/src/memory.c \
            drivers/vga/vga.c drivers/keyboard/keyboard.c \
            drivers/timer/timer.c \
@@ -31,6 +33,7 @@ kernel.elf: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
 	$(CC) $(CFLAGS) -c kernel/src/idt.c -o kernel/idt.o
 	$(CC) $(CFLAGS) -c kernel/src/io.c -o kernel/io.o
 	$(AS) -f elf64 kernel/src/interrupts.s -o kernel/interrupts.o
+	$(AS) -f elf64 kernel/src/idt_flush.s -o kernel/idt_flush.o
 	$(CC) $(CFLAGS) -c kernel/src/memory.c -o kernel/memory.o
 	$(CC) $(CFLAGS) -c drivers/vga/vga.c -o drivers/vga/vga.o
 	$(CC) $(CFLAGS) -c drivers/keyboard/keyboard.c -o drivers/keyboard/keyboard.o
@@ -40,17 +43,21 @@ kernel.elf: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s \
 	$(CC) $(CFLAGS) -c fs/fat32/fat32.c -o fs/fat32/fat32.o
 	$(LD) $(LDFLAGS) --oformat=elf64-x86-64 \
 		kernel/main.o kernel/gdt.o kernel/gdt_flush.o \
-		kernel/idt.o kernel/io.o kernel/interrupts.o kernel/memory.o \
-		 drivers/vga/vga.o drivers/keyboard/keyboard.o drivers/timer/timer.o \
-		 gui/src/window_manager.o file_explorer/src/explorer.o fs/fat32/fat32.o -o kernel.elf
+		kernel/idt.o kernel/io.o kernel/interrupts.o kernel/idt_flush.o \
+		kernel/memory.o \
+		drivers/vga/vga.o drivers/keyboard/keyboard.o drivers/timer/timer.o \
+		gui/src/window_manager.o file_explorer/src/explorer.o fs/fat32/fat32.o -o kernel.elf
 
 scooter_os.bin: boot.bin kernel.elf
 	objcopy -O binary kernel.elf kernel.bin
-	copy /b boot.bin + kernel.bin scooter_os.bin
+	ls -l kernel.bin
+	dd if=/dev/zero of=scooter_os.bin bs=512 count=2880
+	dd if=boot.bin of=scooter_os.bin conv=notrunc
+	dd if=kernel.bin of=scooter_os.bin conv=notrunc seek=1
 
 clean:
 	rm -f boot.bin kernel.elf kernel/*.o drivers/vga/*.o drivers/keyboard/*.o drivers/timer/*.o \
 	      gui/src/*.o file_explorer/src/*.o fs/fat32/*.o scooter_os.bin
 
 run: all
-	"C:\Program Files\qemu\qemu-system-x86_64.exe" -drive format=raw,file=scooter_os.bin
+	qemu-system-x86_64 -drive format=raw,file=scooter_os.bin -d int -D qemu.log -monitor stdio

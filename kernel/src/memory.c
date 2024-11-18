@@ -47,4 +47,8 @@ void init_paging() {
         :
         : "eax", "edx"
     );
+}
+
+void init_memory() {
+    init_paging();
 } 

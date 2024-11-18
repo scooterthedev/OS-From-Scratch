@@ -4,22 +4,20 @@ SECTIONS
 {
     . = 1M;
 
-    .text ALIGN(4K) : {
-        _kernel_start = .;
-        *(.text*)
+    .text BLOCK(4K) : ALIGN(4K) {
+        *(.text)
     }
 
-    .rodata ALIGN(4K) : {
-        *(.rodata*)
+    .rodata BLOCK(4K) : ALIGN(4K) {
+        *(.rodata)
     }
 
-    .data ALIGN(4K) : {
-        *(.data*)
+    .data BLOCK(4K) : ALIGN(4K) {
+        *(.data)
     }
 
-    .bss ALIGN(4K) : {
-        *(.bss*)
+    .bss BLOCK(4K) : ALIGN(4K) {
         *(COMMON)
+        *(.bss)
     }
-    _kernel_end = .;
 }

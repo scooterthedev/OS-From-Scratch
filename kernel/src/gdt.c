@@ -31,20 +31,20 @@
        gdt[0].granularity = 0;
        gdt[0].base_high = 0;
    
-       // Code segment
+       // Code segment for long mode
        gdt[1].limit_low = 0xFFFF;
        gdt[1].base_low = 0;
        gdt[1].base_middle = 0;
        gdt[1].access = 0x9A;       // Present, Ring 0, Code segment, Readable
-       gdt[1].granularity = 0xCF;   // 4K granularity, 32-bit
+       gdt[1].granularity = 0xAF;   // Long mode, 4K granularity
        gdt[1].base_high = 0;
    
-       // Data segment
+       // Data segment for long mode
        gdt[2].limit_low = 0xFFFF;
        gdt[2].base_low = 0;
        gdt[2].base_middle = 0;
        gdt[2].access = 0x92;       // Present, Ring 0, Data segment, Writable
-       gdt[2].granularity = 0xCF;   // 4K granularity, 32-bit
+       gdt[2].granularity = 0xAF;   // Long mode, 4K granularity
        gdt[2].base_high = 0;
    
        gdt_flush((uint64_t)&gp);

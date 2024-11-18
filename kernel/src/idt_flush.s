@@ -1,5 +1,8 @@
-.global idt_flush
+section .text
+global idt_flush
+
+section .note.GNU-stack noalloc noexec nowrite progbits
+
 idt_flush:
-    mov rax, [rdi]
-    lidt [rax]
+    lidt [rdi]      ; Load IDT directly from the address in rdi
     ret

@@ -2,7 +2,7 @@
 #define KERNEL_H
 
 #include <stdint.h>
-#include "io.h"
+#include "../../kernel/include/io.h"
 
 void init_gdt();
 void init_idt();
