@@ -1,6 +1,6 @@
-include "vga.h"
+#include "vga.h"
 
-static char& video_memory = (char*)0xB8000;
+static char* video_memory = (char*)0xB8000;
 
 void vga_print(const char* str) {
     int i = 0;
