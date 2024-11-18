@@ -9,11 +9,13 @@ all: boot.bin kernel.bin scooter_os.bin
 boot.bin: boot/boot_sect.asm
 	$(AS) -f bin boot/boot_sect.asm -o boot.bin
 
-kernel.bin: kernel/src/main.c
+kernel.bin: kernel/src/main.c kernel/src/gdt.c kernel/src/gdt_flush.s
 	$(CC) $(CFLAGS) -c kernel/src/main.c -o kernel/main.o
+	$(CC) $(CFLAGS) -c kernel/src/gdt.c -o kernel/gdt.o
+	$(AS) -f elf64 kernel/src/gdt_flush.s -o kernel/gdt_flush.o
 
 scooter_os.bin: boot.bin kernel.bin linker.ld
-	$(LD) $(LDFLAGS) boot.bin kernel/main.o -o scooter_os.bin
+	$(LD) $(LDFLAGS) boot.bin kernel/main.o kernel/gdt.o kernel/gdt_flush.o -o scooter_os.bin
 
 clean:
 	rm -f boot.bin kernel/*.o scooter_os.bin
