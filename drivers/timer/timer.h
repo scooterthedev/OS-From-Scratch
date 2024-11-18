@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 void timer_init();
-void timer_handler();
+void timer_handler_c();
 
 #endif

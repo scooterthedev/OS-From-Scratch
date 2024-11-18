@@ -40,12 +40,12 @@ void init_idt() {
     }
 
     // Set keyboard interrupt (IRQ1 mapped to interrupt 33)
-    extern void keyboard_handler();
-    set_idt_gate(33, (uint64_t)keyboard_handler, 0, 0x8E);
-
+    extern void keyboard_interrupt_handler();
+    set_idt_gate(33, (uint64_t)keyboard_interrupt_handler, 0, 0x8E);
+    
     // Set timer interrupt (IRQ0 mapped to interrupt 32)
     extern void timer_interrupt_handler();
     set_idt_gate(32, (uint64_t)timer_interrupt_handler, 0, 0x8E);
-
+    
     idt_flush((uint64_t)&idtp);
 }

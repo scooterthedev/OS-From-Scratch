@@ -1,23 +1,25 @@
- ENTRY(start)
- SECTIONS
- {
+ENTRY(kernel_main)
+OUTPUT_FORMAT(elf64-x86-64)
+SECTIONS
+{
     . = 1M;
 
     .text ALIGN(4K) : {
-        *(.multiboot)
+        _kernel_start = .;
         *(.text*)
- }
+    }
 
     .rodata ALIGN(4K) : {
         *(.rodata*)
-}
+    }
 
     .data ALIGN(4K) : {
         *(.data*)
     }
 
     .bss ALIGN(4K) : {
-        *.(.bss*)
+        *(.bss*)
         *(COMMON)
     }
+    _kernel_end = .;
 }

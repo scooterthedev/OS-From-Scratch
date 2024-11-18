@@ -1,27 +1,31 @@
 #include <kernel.h>
-#include "../drivers/vga/vga.h"
-#include "../drivers/keyboard/keyboard.h"
-#include "../fs/fat32/fat32.h"
-#include "../gui/src/window_manager.h"
-#include "../file_explorer/src/explorer.h"
+#include <vga.h>
+#include <keyboard.h>
+#include <timer.h>
+#include <fat32.h>
+#include <window_manager.h>
+#include <explorer.h>
 
 void kernel_main() {
-    init_gdt(); // Initializing the Global Descriptor Table ie. GDP
-    init_idt(); // Initializing the Interrupt Descriptor Table ie. IDT
+    // Initialize kernel subsystems
+    init_gdt(); // Initialize the Global Descriptor Table
+    init_idt(); // Initialize the Interrupt Descriptor Table
     init_memory(); // Initializing the memory management ie. your memory manager so memory.c dosen't use the pagefile to access all the memory for no reason.
 
     // Initializing drivers
     vga_print("Welcome to ScooterOS!!!\n");
     keyboard_init();
+    timer_init();
     fat32_init();
 
-    // Initializing the GUI components
+    // Initialize GUI components
     window_manager_init();
     render_window("Main Window");
     explorer_init();
     display_directory("/");
 
     while(1) {
-        // Make the kernel to an infinite loop
+        // Kernel infinite loop
+        // Can implement sleep or low-power state
     }
 }

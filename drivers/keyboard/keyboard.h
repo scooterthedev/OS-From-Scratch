@@ -2,8 +2,11 @@
 #define KEYBOARD_H
 
 #include <stdint.h>
+#include <kernel.h>
 
-void keyboard_init();
-void keyboard_interrupt_handler();
+// Function declarations
+void keyboard_init(void);
+void keyboard_interrupt_handler_c(void);
+extern void keyboard_interrupt_handler(void);
 
-#endif
+#endif // KEYBOARD_H
